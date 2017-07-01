@@ -4,7 +4,7 @@ use App::Miroku::Template;
 
 unit class App::Miroku;
 
-has $!auther = qx{git config --global user.name}.chomp;
+has $!author = qx{git config --global user.name}.chomp;
 has $!email  = qx{git config --global user.email}.chomp;
 has $!year   = Date.today.year;
 
@@ -23,7 +23,7 @@ my &to-file = -> $module-name {
 };
 
 
-multi method perform('new', Str $module-name is copy, Str :$prefix = Nil, Str :$to = '.', Str :$type = 'lib') {
+multi method perform('new', Str $module-name is copy, Str :$prefix, Str :$to = '.', Str :$type = 'lib') {
     my $main-dirname = $module-name.subst( '::', '-', :g );
     $main-dirname = $prefix ~ $main-dirname if $prefix;
 
@@ -49,7 +49,7 @@ multi method perform('new', Str $module-name is copy, Str :$prefix = Nil, Str :$
         my %contents = template-on(
             :module($module-name),
             :$!author, $!email, :$!year,
-            dist => $module.subst( '::', '-', :g )
+            dist => $module-name.subst( '::', '-', :g )
         );
     }
 }

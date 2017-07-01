@@ -1,8 +1,8 @@
 use v6;
 
-unit module App::Miroku::Template;
+module App::Miroku::Template {
 
-sub template-on(:$module, :$dist, $author, :$email, :$year) {
+our sub template-on(:$module, :$dist, :$author, :$email, :$year) {
     my %templates = (
         gitignore => qq:to/EOF/,
 /blib/
@@ -27,7 +27,7 @@ install:
   - rakudobrew build-zef
   - zef --debug --depsonly install .
 script:
-  - PERL6LIB=$PWD/lib prove -e perl6 -vr t/
+  - PERL6LIB=\$PWD/lib prove -e perl6 -vr t/
 sudo: false
 EOF
 
@@ -279,11 +279,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 END_OF_LICENSE
     );
 
-    %templates:
+    %templates;
+}
+
 }
 
 sub EXPORT {
     {
-        '&template-on' => &template-on
+        '&template-on' => &App::Miroku::Template::template-on
     }
 }
