@@ -1,0 +1,20 @@
+{
+    "authors": [
+        "Ned Rihine"
+    ],
+    "build-depends": [ ],
+    "depends": [],
+    "description": "neo minimal authoring tool for Perl6",
+    "license": "Artistic-2.0",
+    "name": "App::Miroku",
+    "perl": "6.c",
+    "provedes": {
+        "App::Miroku": "lib/App/Miroku.pm6",
+        "App::Miroku::Template": "lib/App/Miroku/Template.pm6"
+    },
+    "resources": [ ],
+    "source-url": "",
+    "tags": [ ],
+    "test-depends": [ ],
+    "version": "0.0.1"
+}
