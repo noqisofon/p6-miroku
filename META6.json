@@ -4,7 +4,7 @@
     ],
     "build-depends": [ ],
     "depends": [],
-    "description": "neo minimal authoring tool for Perl6",
+    "description": "Yet another minimal authoring tool for Perl6",
     "license": "Artistic-2.0",
     "name": "App::Miroku",
     "perl": "6.c",
