@@ -6,8 +6,8 @@ use App::Miroku;
 my $app = App::Miroku.new;
 
 
-multi MAIN('new', $module, Str $prefix = 'p6-') {
-    $app.perform( 'new', $prefix, $module );
+multi MAIN('new', $module, Str $prefix = 'p6-', Str :$to = '.', Str :$type = 'lib') {
+    $app.perform( 'new', $module, :$prefix, :$to, :$type );
 }
 
 multi MAIN('build') {
@@ -18,10 +18,10 @@ multi MAIN('test', *@file, Bool :v(:$verbose), Int :j(:$jobs)) {
     $app.perform( 'test', @file, :$verbose, :$jobs );
 }
 
-multi MAIN('help') { usage }
-multi MAIN(:h(:$help)!) { usage }
+multi MAIN('help') { USAGE }
+multi MAIN(:h(:$help)!) { USAGE }
 
-sub usage() {
+sub USAGE() {
     require Pod::To::Text;
     ::('Pod::To::Text').render($=pod).say;
 }

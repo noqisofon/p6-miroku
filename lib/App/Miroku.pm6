@@ -25,9 +25,14 @@ my &to-file = -> $module-name {
 
 multi method perform('new', Str $module-name is copy, Str :$prefix, Str :$to = '.', Str :$type = 'lib') {
     my $main-dirname = $module-name.subst( '::', '-', :g );
+
     $main-dirname = $prefix ~ $main-dirname if $prefix;
 
+    say $to;
+
     my $main-dir = $to.IO.resolve.add( $main-dirname );
+
+    say $main-dir;
 
     die "Already exists $main-dir" if $main-dir.IO ~~ :d;
     
@@ -46,11 +51,35 @@ multi method perform('new', Str $module-name is copy, Str :$prefix, Str :$to = '
 
         mkdir( $_ ) for @child-dirs;
 
-        my %contents = template-on(
+        my %contents = App::Miroku::Template::get-template(
             :module($module-name),
             :$!author, $!email, :$!year,
             dist => $module-name.subst( '::', '-', :g )
         );
+
+        my %path-by-key = (
+            $module-filepath => 'module',
+            't/01-basic.t'   => 'test',
+            'LICENSE'        => 'license',
+            '.gitignore'     => 'gitignore',
+            '.travis.yml'    => 'travis'
+        );
+
+        for %path-by-key -> $path, $key {
+            spurt( $path, %contents{$key} );
+        }
+
+        self.perform( 'build' );
+
+        my $dev-null = open $*SPEC.devnull, :w;
+        {
+            run 'git', 'init', '.', :out($dev-null);
+
+            $dev-null.close;
+        }
+        run 'git', 'add', '.';
+
+        note "Successfully created $main-dir";
     }
 }
 

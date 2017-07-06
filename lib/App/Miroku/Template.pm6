@@ -1,8 +1,8 @@
 use v6;
 
-module App::Miroku::Template {
+unit module App::Miroku::Template;
 
-our sub template-on(:$module, :$dist, :$author, :$email, :$year) {
+our sub get-template(:$module, :$dist, :$author, :$email, :$year) {
     my %templates = (
         gitignore => qq:to/EOF/,
 /blib/
@@ -280,12 +280,4 @@ END_OF_LICENSE
     );
 
     %templates;
-}
-
-}
-
-sub EXPORT {
-    {
-        '&template-on' => &App::Miroku::Template::template-on
-    }
 }
