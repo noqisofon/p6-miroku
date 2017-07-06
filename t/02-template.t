@@ -15,7 +15,7 @@ class TemplateTest {
         my %contents = App::Miroku::Template::get-template(
             :module($module-name),
             :$!author, :$!email, :$!year,
-            dist   => $module-name.subst( '::', '-', :g )
+            dist => $module-name.subst( '::', '-', :g )
         );
 
         ok %contents;
