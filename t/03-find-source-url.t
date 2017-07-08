@@ -38,3 +38,26 @@ my $url = find-source-url;
 say $url;
 
 ok $url;
+is 'git://github.com/noqisofon/p6-miroku.git', $url;
+
+sub guess-user-and-repository() {
+    my $source-url = find-source-url;
+
+    return if $source-url eq '';
+
+    if $source-url ~~ m{ ( 'git' | 'http' 's'? ) '://'
+                         [<-[/]>+] '/'
+                         $<user>=[<-[/]>+] '/'
+                         $<repo>=[.+?] [\.git]?
+                         $}
+    {
+        return $/<user>, $/<repo>;
+    }
+
+    return ;
+}
+
+my @user-and-repo = guess-user-and-repository;
+
+is 'noqisofon', @user-and-repo[0],   'user is "noqisofon"?';
+is 'p6-miroku', @user-and-repo[1],   'repository is "p6-miroku"?';
