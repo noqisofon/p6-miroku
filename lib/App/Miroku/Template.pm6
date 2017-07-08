@@ -65,7 +65,7 @@ $module is ...
 
 $author <$email>
 
-= head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENSE
 
 Copyright $year $author
 
