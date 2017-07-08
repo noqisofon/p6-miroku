@@ -32,14 +32,6 @@ sub find-source-url() {
     $url;
 }
 
-
-my $url = find-source-url;
-
-say $url;
-
-ok $url;
-is 'git://github.com/noqisofon/p6-miroku.git', $url;
-
 sub guess-user-and-repository() {
     my $source-url = find-source-url;
 
@@ -56,6 +48,13 @@ sub guess-user-and-repository() {
 
     return ;
 }
+
+plan 4;
+
+my $url = find-source-url;
+
+ok $url;
+is 'git://github.com/noqisofon/p6-miroku.git', $url;
 
 my @user-and-repo = guess-user-and-repository;
 

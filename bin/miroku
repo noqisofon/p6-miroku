@@ -31,6 +31,8 @@ sub USAGE() {
 =head1 USAGE
 
   > miroku new Foo::Bar # create p6-Foo-Bar distribution
-  > miroku build        # 
+  > miroku build        #
+
+  > miroku test         # 
 
 =end pod

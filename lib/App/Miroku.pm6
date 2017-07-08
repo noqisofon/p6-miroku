@@ -72,7 +72,25 @@ multi method perform('build') {
     self.build;
 }
 
-multi method perform('test', @file, Bool :$verbose , Int :$jobs) {
+multi method perform('test', @files, Bool :$verbose , Int :$jobs) {
+    with-p6-lib {
+        my @options = '-r';
+        @options.push: '-v'        if $verbose;
+        @options.push: '-j', $jobs if $jobs;
+
+        if @files.elems == 0 {
+            @files = <t xt>.grep( { .IO.d } );
+        }
+
+        my @command = 'prove', '-e', $*EXECUTABLE, |@options, |@files;
+
+        note " ==> set PERL6LIB=%*ENV<PERL6LIB>";
+        note " ==> @command[]";
+
+        my $proc = run |@command;
+
+        $proc.exitcode;
+    }
 }
 
 method build($build-filename = 'Build.pm') {
@@ -88,7 +106,8 @@ method build($build-filename = 'Build.pm') {
 }
 
 method !generate-meta-info($module, $module-file) {
-    
+    # my $meta-file = <META6.json META.info>.grep( { .IO ~~ :f & :!l } ).first;
+    # my $already   = 
 }
 
 sub get-child-dirs(Str $type, $module-dir) {
