@@ -29,6 +29,8 @@ SEE ALSO
 
   * [https://github.com/rhbs/Dist-Zilla](https://github.com/rhbs/Dist-Zilla)
 
+  * [https://github.com/skaji/mi6](https://github.com/skaji/mi6)
+
 COPYRIGHT AND LICENSE
 =====================
 

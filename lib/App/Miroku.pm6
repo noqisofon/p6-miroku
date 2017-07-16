@@ -307,6 +307,7 @@ App::Miroku - Yet another minimal authoring tool for Perl6
 
 =item L<<https://github.com/tokuhirom/Minilla>>
 =item L<<https://github.com/rhbs/Dist-Zilla>>
+=item L<<https://github.com/skaji/mi6>>
 
 =head1 COPYRIGHT AND LICENSE
 
