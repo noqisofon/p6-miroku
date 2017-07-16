@@ -2,6 +2,7 @@ use v6;
 
 use File::Find;
 
+use App::Miroku::JSON;
 use App::Miroku::Template;
 
 unit class App::Miroku;
@@ -39,7 +40,7 @@ multi method perform('new', Str $module-name is copy, Str :$prefix, Str :$to = '
     my $module-filepath = to-file( $module-name );
     my $module-dir      = $module-filepath.IO.dirname.Str;
 
-    my @child-dirs = get-child-dirs($type, $module-dir);
+    my @child-dirs = get-child-dirs( $type, $module-dir );
     
     mkdir( $_ ) for @child-dirs;
 
@@ -106,8 +107,10 @@ method build($build-filename = 'Build.pm') {
 }
 
 method !generate-meta-info($module, $module-file) {
-    # my $meta-file = <META6.json META.info>.grep( { .IO ~~ :f & :!l } ).first;
-    # my $already   = 
+    my $meta-file = <META6.json META.info>.grep( { .IO ~~ :f & :!l } ).first;
+    my $already   = $meta-file.defined ?? App::Miroku::JSON::decode( $meta-file.IO.slurp ) !! {};
+
+    
 }
 
 sub get-child-dirs(Str $type, $module-dir) {
@@ -171,7 +174,7 @@ sub git-add() {
 sub with-p6-lib(&block) {
     temp %*ENV;
 
-    %*ENV<PERL6LIB> = %*ENV<PERL6LIB>:exists ?? "$*CWD/lib," ~~ %*ENV<PERL6LIB> !! "$*CWD/lib,";
+    %*ENV<PERL6LIB> = %*ENV<PERL6LIB>:exists ?? "$*CWD/lib,%*ENV<PERL6LIB>" !! "$*CWD/lib,";
 
     block;
 }
