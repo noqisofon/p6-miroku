@@ -281,3 +281,37 @@ sub guess-main-module($lib-dir = 'lib') {
         }
     }
 }
+
+=begin pod
+
+=head1 NAME
+
+App::Miroku - Yet another minimal authoring tool for Perl6
+
+=head1 SYNOPSIS
+
+  > miroku new Foo::Bar  # create p6-Foo-Bar distribution
+  > cd ./p6-Foo-Bar
+  > miroku build         # generate README.md, META6.json
+  > miroku test          # run tests
+ 
+=head1 INSTALLATION
+
+  > zef install App::Miroku
+
+=head1 DESCRIPTION
+
+=head1 FAQ
+
+=head1 SEE ALSO
+
+=item L<<https://github.com/tokuhirom/Minilla>>
+=item L<<https://github.com/rhbs/Dist-Zilla>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2017 Ned Rihine
+
+This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+
+=end pod
