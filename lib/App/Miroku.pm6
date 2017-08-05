@@ -1,8 +1,8 @@
 use v6;
 
 use File::Find;
+use JSON::Fast;
 
-use App::Miroku::JSON;
 use App::Miroku::Template;
 
 unit class App::Miroku;
@@ -108,9 +108,54 @@ method build($build-filename = 'Build.pm') {
 
 method !generate-meta-info($module, $module-file) {
     my $meta-file = <META6.json META.info>.grep( { .IO ~~ :f & :!l } ).first;
-    my $already   = $meta-file.defined ?? App::Miroku::JSON::decode( $meta-file.IO.slurp ) !! {};
 
+    my %already   = do if $meta-file.defined {
+        from-json( $meta-file.IO.slurp )
+    } else {
+        {}
+    };
     
+    my @authors = do if %already<authors> {
+        %already<authors>
+    } elsif %already<author> {
+        [ %already<author>:delete ]
+    } else {
+        [ $!author ]
+    };
+
+    my $perl6-version = %already<perl> || $*PERL.version.Str;
+
+    $perl6-version ~~ s/^v//;
+
+    my @command = $*EXECUTABLE, "-M$module", '-e', "$module.^ver.Str.say";
+    my $proc    = with-p6-lib { run |@command, :out, :err };
+
+    my $module-version = $proc.out.slurp-rest.chomp || %already<version>;
+
+    $module-version = '0.0.1' if $module-version eq "*";
+
+    my %new-meta = (
+        name          => $module,
+        perl          => $perl6-version,
+        authors       => @authors,
+        depends       => %already<depends>                || [],
+        test-depends  => %already<test-depends>           || [],
+        build-depends => %already<build-depends>          || [],
+        description   => find-description( $module-file ) || %already<description> || '',
+        provides      => find-provides(),
+        source-url    => %already<source-url>             || find-source-url(),
+        version       => $module-version,
+        resources     => %already<resources>              || [],
+        tags          => %already<tags>                   || [],
+        license       => %already<license>                || guess-license()
+    );
+
+    for %already.keys -> $key {
+        %new-meta{$key} = %already{$key} unless %new-meta{$key}:exists;
+    }
+
+    $meta-file = 'META6.json' unless $meta-file.defined;
+    $meta-file.IO.spurt: to-json( %new-meta ) ~ "\n";
 }
 
 sub get-child-dirs(Str $type, $module-dir) {
@@ -199,21 +244,17 @@ sub generate-read-me($module-file, $document-type = 'Markdown') {
     spurt 'README.md', $header ~ $contents;
 }
 
-sub guess-user-and-repository() {
-    my $source-url = find-source-url;
+sub find-description($module-file) {
+    my $content = $module-file.IO.slurp;
 
-    return if $source-url eq '';
-
-    if $source-url ~~ m{ ( 'git' | 'http' 's'? ) '://'
-                         [<-[/]>+] '/'
-                         $<user>=[<-[/]>+] '/'
-                         $<repo>=[.+?] [\.git]?
-                         $}
-    {
-        return $/<user>, $/<repo>;
-    }
-
-    return ;
+    return do if $content ~~ /^^
+    '=' head. \s+ NAME
+    \s+
+    \S+ \s+ '-' \s+ (\S<-[\n]>*)/ {
+        $/[0].Str
+    } else {
+        ''
+    };
 }
 
 sub find-source-url() {
@@ -237,12 +278,40 @@ sub find-source-url() {
 
     $url ~~ s/^https?/git/;
 
-    if $url ~~ m/'git@' $<host>=[.+] ':' $<repo>=[<-[:]>+] $/ {
-        $url = "git://$<host>/$<repo>";
+    $url = do if $url ~~ m/'git@' $<host>=[.+] ':' $<repo>=[<-[:]>+] $/ {
+        "git://$<host>/$<repo>";
     } elsif $url ~~ m/'ssh://git@' $<rest>=[.+] / {
-        $url = "git://$<rest>";
+        "git://$<rest>";
     }
     $url;
+}
+
+sub find-provides() {
+    my %provides = find( dir => 'lib', name => /\.pm6?$/ ).list.map(
+        -> $file {
+            my $module = to-module( $file.Str );
+
+            $module => normalize-path( $file.Str );
+        } ).sort;
+
+    %provides;
+}
+
+sub guess-user-and-repository() {
+    my $source-url = find-source-url;
+
+    return if $source-url eq '';
+
+    if $source-url ~~ m{ ( 'git' | 'http' 's'? ) '://'
+                         [<-[/]>+] '/'
+                         $<user>=[<-[/]>+] '/'
+                         $<repo>=[.+?] [\.git]?
+                         $}
+    {
+        return $/<user>, $/<repo>;
+    }
+
+    return ;
 }
 
 sub guess-main-module($lib-dir = 'lib') {
@@ -280,6 +349,20 @@ sub guess-main-module($lib-dir = 'lib') {
             return ( to-module( $a-file ), $a-file );
         }
     }
+}
+
+sub guess-license() {
+    my $license-file = 'LICENSE'.IO;
+
+    return 'NOASSERTION' unless $license-file;
+
+    my @lines = $license-file.lines;
+
+    return do if @lines.elems == 201 && @lines.first.index( 'The Artistic License 2.0' ) {
+        'Artistic-2.0'
+    } else {
+        'NOASSERTION'
+    };
 }
 
 =begin pod
