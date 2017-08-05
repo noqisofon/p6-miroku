@@ -51,6 +51,12 @@ sub guess-user-and-repository() {
 
 plan 4;
 
+unless '.git'.IO.e {
+    skip-rest( "We can't find source from git repository, Not found .git/" );
+
+    exit;
+}
+
 my $url = find-source-url;
 
 ok $url;
@@ -60,3 +66,5 @@ my @user-and-repo = guess-user-and-repository;
 
 is 'noqisofon', @user-and-repo[0],   'user is "noqisofon"?';
 is 'p6-miroku', @user-and-repo[1],   'repository is "p6-miroku"?';
+
+done-testing;
