@@ -17,8 +17,12 @@ my &to-file = -> $module-name {
     './lib/'.IO.add( $path ).Str
 };
 
+plan 3;
+
 is 'hoge.txt'           , normalize-path( './hoge.txt' );
 
 is 'Hoge::Piyo'         , to-module( './lib/Hoge/Piyo.pm6' );
 
 is './lib/Hoge/Piyo.pm6', to-file( 'Hoge::Piyo' );
+
+done-testing;
