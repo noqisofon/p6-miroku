@@ -3,6 +3,7 @@ use v6;
 use File::Find;
 use JSON::Fast;
 
+use App::Miroku::Module;
 use App::Miroku::Template;
 
 unit class App::Miroku;
@@ -10,21 +11,6 @@ unit class App::Miroku;
 has $!author = qx{git config --global user.name}.chomp;
 has $!email  = qx{git config --global user.email}.chomp;
 has $!year   = Date.today.year;
-
-my &normalize-path = -> $path {
-    $*DISTRO.is-win ?? $path.subst( '\\', '/', :g ).IO.relative !! $path.IO.relative
-};
-
-my &to-module = -> $filename {
-    normalize-path( $filename ).Str.subst( 'lib/', '' ).subst( '/', '::', :g ).subst( /\.pm6?$/, '' )
-};
-
-my &to-file = -> $module-name {
-    my $path = $module-name.subst( '::', '/', :g ) ~ '.pm6';
-
-    './lib/'.IO.add( $path ).Str
-};
-
 
 multi method perform('new', Str $module-name is copy, Str :$prefix, Str :$to = '.', Str :$type = 'lib') {
     my $main-dirname = $module-name.subst( '::', '-', :g );

@@ -18,6 +18,7 @@
   ],
   "provides": {
     "App::Miroku": "lib/App/Miroku.pm6",
+    "App::Miroku::Module": "lib/App/Miroku/Module.pm6",
     "App::Miroku::Template": "lib/App/Miroku/Template.pm6"
   },
   "test-depends": [

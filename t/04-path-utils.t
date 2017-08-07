@@ -3,26 +3,20 @@ use v6;
 
 use Test;
 
-my &normalize-path = -> $path {
-    $*DISTRO.is-win ?? $path.subst( '\\', '/', :g ).IO.relative !! $path.IO.relative
-};
+use App::Miroku::Module;
 
-my &to-module = -> $filename {
-    normalize-path( $filename ).Str.subst( 'lib/', '' ).subst( '/', '::', :g ).subst( /\.pm6?$/, '' )
-};
-
-my &to-file = -> $module-name {
-    my $path = $module-name.subst( '::', '/', :g ) ~ '.pm6';
-
-    './lib/'.IO.add( $path ).Str
-};
-
-plan 3;
+plan 6;
 
 is 'hoge.txt'           , normalize-path( './hoge.txt' );
 
+is 'lib/Hoge/Piyo.pm6'  , normalize-path( './lib/Hoge/Piyo.pm6' );
+
 is 'Hoge::Piyo'         , to-module( './lib/Hoge/Piyo.pm6' );
 
+is 'Hoge::Piyo'         , to-module( './Hoge/Piyo.pm6' );
+
 is './lib/Hoge/Piyo.pm6', to-file( 'Hoge::Piyo' );
+
+is './lib/Foo/Bar.pm6'  , to-file( 'Foo::Bar' );
 
 done-testing;
