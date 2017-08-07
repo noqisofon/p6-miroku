@@ -115,8 +115,8 @@ method !generate-meta-info($module, $module-file) {
         {}
     };
     
-    my $authors = do if %already<authors>:exists {
-        %already<authors>
+    my @authors = do if %already<authors>:exists {
+        |%already<authors>
     } elsif %already<author>:exists {
         [ %already<author>:delete ]
     } else {
@@ -137,7 +137,7 @@ method !generate-meta-info($module, $module-file) {
     my %new-meta = (
         name          => $module,
         perl          => $perl6-version,
-        authors       => $authors,
+        authors       => @authors,
         depends       => %already<depends>                || [],
         test-depends  => %already<test-depends>           || [],
         build-depends => %already<build-depends>          || [],
